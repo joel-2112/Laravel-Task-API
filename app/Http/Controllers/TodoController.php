@@ -27,6 +27,11 @@ class TodoController extends Controller
                 'title' => 'required|string|max:255',
                 'description' => 'nullable|string',
                 'completed' => 'boolean',
+                'user_id' => 'nullable|exists:users,id', // Optional, requires auth
+                'priority' => 'in:low,medium,high',
+                'due_date' => 'nullable|date',
+                'category' => 'nullable|string|max:100',
+                'notes' => 'nullable|string',
             ]);
 
             $todo = Todo::create($validated);
@@ -48,6 +53,11 @@ class TodoController extends Controller
                 'title' => 'sometimes|string|max:255',
                 'description' => 'nullable|string',
                 'completed' => 'sometimes|boolean',
+                'user_id' => 'sometimes|nullable|exists:users,id',
+                'priority' => 'sometimes|in:low,medium,high',
+                'due_date' => 'nullable|date',
+                'category' => 'nullable|string|max:100',
+                'notes' => 'nullable|string',
             ]);
 
             $todo->update($validated);
