@@ -1,0 +1,75 @@
+<?php
+namespace App\Http\Controllers;
+
+use App\Http\Resources\TodoResource;
+use App\Http\Resources\TodoCollection;
+use App\Models\Todo;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+
+class TodoController extends Controller
+{
+    public function index()
+    {
+        $todos = Todo::all();
+        return new TodoCollection($todos);
+    }
+
+    public function show(Todo $todo)
+    {
+        return new TodoResource($todo);
+    }
+
+    public function store(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'title' => 'required|string|max:255',
+                'description' => 'nullable|string',
+                'completed' => 'boolean',
+            ]);
+
+            $todo = Todo::create($validated);
+            return (new TodoResource($todo))
+                ->response()
+                ->setStatusCode(Response::HTTP_CREATED);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Failed to create todo',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function update(Request $request, Todo $todo)
+    {
+        try {
+            $validated = $request->validate([
+                'title' => 'sometimes|string|max:255',
+                'description' => 'nullable|string',
+                'completed' => 'sometimes|boolean',
+            ]);
+
+            $todo->update($validated);
+            return new TodoResource($todo);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Failed to update todo',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function destroy(Todo $todo)
+    {
+        try {
+            $todo->delete();
+            return response()->json(null, Response::HTTP_NO_CONTENT);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Failed to delete todo',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+}
