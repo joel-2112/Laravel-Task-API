@@ -27,7 +27,7 @@ class TodoController extends Controller
                 'title' => 'required|string|max:255',
                 'description' => 'nullable|string',
                 'completed' => 'boolean',
-                'user_id' => 'nullable|exists:users,id', // Optional, requires auth
+                'user_id' => 'nullable|exists:users,id', 
                 'priority' => 'in:low,medium,high',
                 'due_date' => 'nullable|date',
                 'category' => 'nullable|string|max:100',
