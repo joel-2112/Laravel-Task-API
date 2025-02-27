@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Http\Resources\TodoResource;
@@ -9,17 +10,16 @@ use Illuminate\Http\Response;
 
 class TodoController extends Controller
 {
+    //display list of todos
     public function index()
     {
         $todos = Todo::all();
         return new TodoCollection($todos);
     }
 
-    public function show(Todo $todo)
-    {
-        return new TodoResource($todo);
-    }
-
+    
+     //Store a newly created todo in storage.
+    
     public function store(Request $request)
     {
         try {
@@ -27,7 +27,7 @@ class TodoController extends Controller
                 'title' => 'required|string|max:255',
                 'description' => 'nullable|string',
                 'completed' => 'boolean',
-                'user_id' => 'nullable|exists:users,id', 
+                'user_id' => 'nullable|exists:users,id',
                 'priority' => 'in:low,medium,high',
                 'due_date' => 'nullable|date',
                 'category' => 'nullable|string|max:100',
@@ -46,6 +46,13 @@ class TodoController extends Controller
         }
     }
 
+    //desplay specific todo by id    
+    public function show(Todo $todo)
+    {
+        return new TodoResource($todo);
+    }
+
+    //update the todo by id
     public function update(Request $request, Todo $todo)
     {
         try {
@@ -70,6 +77,7 @@ class TodoController extends Controller
         }
     }
 
+   //delete the todo
     public function destroy(Todo $todo)
     {
         try {

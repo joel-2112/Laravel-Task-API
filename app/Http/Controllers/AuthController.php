@@ -86,4 +86,31 @@ class AuthController extends Controller
             ], 500);
         }
     }
+
+    public function logout(Request $request)
+    {
+        try {
+            // Step 1: Check if the user is authenticated
+            if (!$request->user()) {
+                return response()->json([
+                    'message' => 'User not authenticated'
+                ], 401);
+            }
+    
+            // Step 2: Revoke the token
+            $request->user()->currentAccessToken()->delete();
+    
+            // Step 3: Return a success response
+            return response()->json([
+                'message' => 'Logged out successfully'
+            ], 200);
+    
+        } catch (\Exception $e) {
+            // Step 4: Handle any exceptions
+            return response()->json([
+                'message' => 'An error occurred during logout',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }
