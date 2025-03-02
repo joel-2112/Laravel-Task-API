@@ -81,8 +81,13 @@ class TodoController extends Controller
     public function destroy(Todo $todo)
     {
         try {
+            if (!$todo) {
+                return response()->json([
+                    'message' => 'Todo not found',
+                ], 404);
+            }
             $todo->delete();
-            return response()->json(null, Response::HTTP_NO_CONTENT);
+            return response()->json(['message'=>'task deleted successfully'],204);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Failed to delete todo',

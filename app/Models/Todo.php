@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Todo extends Model
 {
-    protected $fillable = [
+    protected $fillable = [     
         'title',
         'description',
         'completed',
