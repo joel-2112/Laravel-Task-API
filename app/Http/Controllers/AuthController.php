@@ -17,9 +17,6 @@ class AuthController extends Controller
                 'password' => 'required|string|min:8',
             ]);
     
-            // Step 2: Hash the password -> laravel hash it by defult
-            // $validatedData['password'] = Hash::make($validatedData['password']);
-    
             // Step 3: Create the user
             $user = User::create($validatedData);
     
