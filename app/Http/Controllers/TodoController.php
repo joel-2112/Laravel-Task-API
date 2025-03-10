@@ -1,98 +1,85 @@
 <?php
 
 namespace App\Http\Controllers;
-
-use App\Http\Resources\TodoResource;
-use App\Http\Resources\TodoCollection;
 use App\Models\Todo;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-
 class TodoController extends Controller
 {
     //display list of todos
-    public function index()
+    public function getAllTodos()
     {
         $todos = Todo::all();
-        return new TodoCollection($todos);
+        return response()->json([
+            'message' => 'Retrieved successfully',
+            'todo' => $todos,
+        ]);
+    }
+      
+    //create a new todo
+    public function createTodo(){
+        $todo = new Todo();
+        $todo->title = request('title');
+        $todo->description = request('description');
+        $todo->save();
+        return response()->json([
+            'message' => 'You have created todo successfully',
+            'todo' => $todo,
+        ]);
+
     }
 
-    
-     //Store a newly created todo in storage.
-    
-    public function store(Request $request)
-    {
-        try {
-            $validated = $request->validate([
-                'title' => 'required|string|max:255',
-                'description' => 'nullable|string',
-                'completed' => 'boolean',
-                'user_id' => 'nullable|exists:users,id',
-                'priority' => 'in:low,medium,high',
-                'due_date' => 'nullable|date',
-                'category' => 'nullable|string|max:100',
-                'notes' => 'nullable|string',
-            ]);
+    //display a specific todo
 
-            $todo = Todo::create($validated);
-            return (new TodoResource($todo))
-                ->response()
-                ->setStatusCode(Response::HTTP_CREATED);
-        } catch (\Exception $e) {
+    public function getTodoById($id){
+        $todo = Todo::find($id);
+        if($todo){
             return response()->json([
-                'message' => 'Failed to create todo',
-                'error' => $e->getMessage(),
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+                'message' => 'Retrieved successfully',
+                'todo' => $todo,
+            ]);
+        }else{
+            return response()->json([
+                'message' => 'Todo not found',
+            ], 404);
+        }
+    }
+    //update a specific todo
+    public function updateTodoById($id){
+        $todo = Todo::find($id);
+        if($todo){
+            $todo->title = request('title');
+            $todo->description = request('description');
+            $todo->save();
+            return response()->json(
+                [
+                'message' => 'Todo updated successfully',
+                'todo' => $todo,
+                ]
+        );
+        }else{
+            return response()->json([
+                'message' => 'Todo not found',
+            ], 404);
         }
     }
 
-    //desplay specific todo by id    
-    public function show(Todo $todo)
-    {
-        return new TodoResource($todo);
-    }
+    //delete a specific todo
 
-    //update the todo by id
-    public function update(Request $request, Todo $todo)
-    {
-        try {
-            $validated = $request->validate([
-                'title' => 'sometimes|string|max:255',
-                'description' => 'nullable|string',
-                'completed' => 'sometimes|boolean',
-                'user_id' => 'sometimes|nullable|exists:users,id',
-                'priority' => 'sometimes|in:low,medium,high',
-                'due_date' => 'nullable|date',
-                'category' => 'nullable|string|max:100',
-                'notes' => 'nullable|string',
-            ]);
-
-            $todo->update($validated);
-            return new TodoResource($todo);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Failed to update todo',
-                'error' => $e->getMessage(),
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    }
-
-   //delete the todo
-    public function destroy(Todo $todo)
-    {
-        try {
-            if (!$todo) {
-                return response()->json([
-                    'message' => 'Todo not found',
-                ], 404);
-            }
+    public function deleteTodoById($id){
+        $todo = Todo::find($id);
+        if($todo){
             $todo->delete();
-            return response()->json(['message'=>'task deleted successfully'],204);
-        } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Failed to delete todo',
-                'error' => $e->getMessage(),
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+                'message' => 'the task deleted successfully',
+            ]);
+        }else{
+            return response()->json([
+                'message' => 'Todo not found',
+            ], 404);
         }
     }
+
+
+
+
+
 }
